@@ -22,6 +22,11 @@ begin
 	authors.each do |name|
 		db.execute "INSERT INTO authors(name) VALUES('#{name}')"
 	end
+
+  db.execute 'CREATE TABLE IF NOT EXISTS code_lines( id INTEGER NOT NULL PRIMARY KEY,
+                                                     user_id INTEGER NOT NULL FOREIGN KEY REFERENCES authors(id),
+                                                     addtion INTEGER,
+                                                     deletion INTEGER)'
 rescue SQLite3::Exception => e
 	puts 'Exception occured'
 	puts e
