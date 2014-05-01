@@ -1,0 +1,21 @@
+div class='margin: 20px'
+
+	table class='table table-bordered table-striped table-hover'
+		thead style='background: #eee'
+			tr
+				th ID
+				th Name
+				th Email
+				th Addtions
+				th Deletions
+				/ th Totals
+
+		tbody
+		  - @authors.each do |author|
+			  tr
+					td #{author.id}
+					td #{author.name}
+					td #{author.email}
+					td #{author.daily_code_lines.first.addtions}
+					td #{author.daily_code_lines.first.deletions}
+					/ td #{author[:total]}
