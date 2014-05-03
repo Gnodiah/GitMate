@@ -20,3 +20,9 @@ get '/' do
 
 	slim :index
 end
+
+get '/repos' do
+	@repositories = Repository.all
+
+	slim :repos
+end
