@@ -1,3 +1,18 @@
+
+
+form class='well form-inline'
+  div class="form-group"
+    label Choose a Repo:
+    select class='form-control'
+      - @repositories.each do |repo|
+        option #{repo.name}
+
+  div class="form-group"
+    label Choose a Date:
+    input class='form-control datepicker' style='width:auto'
+  div
+    input type='submit' class='btn btn-primary' value='Submit'
+
 div class='margin: 20px'
 
 	table class='table table-bordered table-striped table-hover'

@@ -9,11 +9,12 @@ get '/' do
 	# Repository.create_repositories
 
 	@authors = Author.all
+	@repositories = Repository.all
 
   # @authors.each do |author|
   #   lines = author.code_lines
-	# 	DailyCodeLine.create(author_id: author.id, repository_id: Repository.first.id, date: '2014-04-28',
-	# 												addtions: lines.first.to_i, deletions: lines.last.to_i)
+	#	  DailyCodeLine.create(author_id: author.id, repository_id: Repository.first.id, date: '2014-04-28',
+	#												addtions: lines.first.to_i, deletions: lines.last.to_i)
   # end
   #@authors.sort! { |x, y| y[:total] <=> x[:total] }
 
