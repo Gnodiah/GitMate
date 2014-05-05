@@ -4,55 +4,43 @@ html
     title GitMate
     link rel="stylesheet" href="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/css/bootstrap.min.css"
     link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css"
-    script src="//code.jquery.com/jquery-1.10.2.js"
-    script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"
-    javascript:
-      $(function() {
-        $('.datepicker').datepicker();
-      });
-
+		script src="http://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"
+		script src="http://libs.baidu.com/jqueryui/1.10.2/jquery-ui.min.js"
+    
 	body
-		div class="navbar navbar-default navbar-fixed-top" role="navigation"
-			div class="container"
-				div class="navbar-header"
-					button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse"
-						span class="sr-only" Toggle navigation
-						span class="icon-bar"
-						span class="icon-bar"
-						span class="icon-bar"
-					a class="navbar-brand" href="/" GitMate
+		.navbar.navbar-default.navbar-fixed-top
+			.container
+				.navbar-header
+					button.navbar-toggle type="button" data-toggle="collapse" data-target=".navbar-collapse"
+						span.sr-only Toggle navigation
+						span.icon-bar
+						span.icon-bar
+						span.icon-bar
+					a.navbar-brand href="/" GitMate
 
-				div class="navbar-collapse collapse"
-					ul class="nav navbar-nav"
-						li class="active" 
-							a href="/" Home
-						li 
-							a href="/repos" Repos
-						li 
-							a href="#contact" Contact
-						li class="dropdown"
-							a ref="#" class="dropdown-toggle" data-toggle="dropdown" Dropdown 
-							ul class="dropdown-menu"
-								li
-									a href="#" Action
-								li
-									a href="#" Another action
-								li
-									a href="#" Something else here
-								li class="divider"
-								li class="dropdown-header" Nav header
-								li
-									a href="#" Separated link
-								li
-									a href="#" One more separated link
-					ul class="nav navbar-nav navbar-right"
-						li
-							a href="../navbar/" Default
-						li
-							a href="../navbar-static-top/" Static top
-						li class="active"
-							a href="./" Fixed top
+				div.navbar-collapse.collapse
+					ul.nav.navbar-nav
+						li.active: a href="/" Authors
+						li: a href="/repos" Repos
+						li: a href="#contact" Contact
+						li.dropdown
+							a.dropdown-toggle href="#" data-toggle="dropdown"
+								| Dropdown
+								b.caret
+							ul.dropdown-menu
+								li: a href="#" Action
+								li: a href="#" Another action
+								li: a href="#" Something else here
+								li.divider
+								li.dropdown-header Nav header
+								li: a href="#" Separated link
+								li: a href="#" One more separated link
+					ul.nav.navbar-nav.navbar-right
+						li: a href="../navbar/" Default
+						li: a href="../navbar-static-top/" Static top
+						li.active: a href="/building" Building Data
 
-		div class='container' style='margin-top: 70px'
+		div.container style='margin-top: 70px'
 			== yield 
 
+		script src="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/js/bootstrap.min.js"
