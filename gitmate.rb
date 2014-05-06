@@ -44,13 +44,15 @@ post '/' do
 	@repositories = Repository.all
 
 	@repository = Repository.find_by(name: params[:repo_name])
-	if @repository.present? #&& DailyCodeLine.count(repository_id: @repository.id, date: params[:date]) == 0
-		@authors.each do |author|
-			lines = author.code_lines(params[:date], @repository.name)
-			DailyCodeLine.where(author_id: author.id, repository_id: @repository.id, date: params[:date],
-													 addtions: lines.first.to_i, deletions: lines.last.to_i).first_or_create
-		end
-	end
+  DailyCodeLine.transaction do
+    if @repository.present? #&& DailyCodeLine.count(repository_id: @repository.id, date: params[:date]) == 0
+      @authors.each do |author|
+        lines = author.code_lines(params[:date], @repository.name)
+        DailyCodeLine.where(author_id: author.id, repository_id: @repository.id, date: params[:date],
+                             addtions: lines.first.to_i, deletions: lines.last.to_i).first_or_create
+      end
+    end
+  end
 
 	slim :authors
 end

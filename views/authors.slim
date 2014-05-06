@@ -34,6 +34,6 @@ table.table.table-bordered.table-striped.table-hover
           td = author.id
           td = author.name
           td = author.email
-          td = code_lines.addtions
-          td = code_lines.deletions
-          td = (code_lines.addtions + code_lines.deletions)
+          td = code_lines.try(:addtions).to_i
+          td = code_lines.try(:deletions).to_i
+          td = (code_lines.try(:addtions).to_i + code_lines.try(:deletions).to_i)
