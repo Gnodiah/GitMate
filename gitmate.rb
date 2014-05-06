@@ -3,9 +3,15 @@ require 'sqlite3'
 require 'slim'
 require_relative 'lib/author'
 
+# Close database connection after each request, for solving problem: 
+# ActiveRecord::ConnectionTimeoutError (could not obtain a database connection within 5 seconds)
 after { ActiveRecord::Base.connection.close }
 
 helpers do
+	def author_exists?(author_id, repo_id)
+    DailyCodeLine.where(author_id: author_id, repository_id: repo_id).present?
+	end
+
 	def find_code_lines(author_id, repo_id, date)
     DailyCodeLine.find_by(author_id: author_id, repository_id: repo_id, date: date)
 	end
@@ -15,7 +21,7 @@ helpers do
 	end
 
 	def generate_date
-		request.get? ? '2014-04-28' : params[:date]
+		request.get? ? Date.today.to_s(:db) : params[:date]
 	end
 end
 
@@ -38,11 +44,11 @@ post '/' do
 	@repositories = Repository.all
 
 	@repository = Repository.find_by(name: params[:repo_name])
-	if @repository.present? && DailyCodeLine.count(repository_id: @repository.id, date: params[:date]) == 0
+	if @repository.present? #&& DailyCodeLine.count(repository_id: @repository.id, date: params[:date]) == 0
 		@authors.each do |author|
-			lines = author.code_lines(params[:date])
-			DailyCodeLine.create(author_id: author.id, repository_id: @repository.try(:id), date: params[:date],
-													 addtions: lines.first.to_i, deletions: lines.last.to_i)
+			lines = author.code_lines(params[:date], @repository.name)
+			DailyCodeLine.where(author_id: author.id, repository_id: @repository.id, date: params[:date],
+													 addtions: lines.first.to_i, deletions: lines.last.to_i).first_or_create
 		end
 	end
 
@@ -55,9 +61,9 @@ get '/building' do
 	Author.create_authors
 	Repository.create_repositories
 
-	@authors.each do |author|
+	Author.all.each do |author|
     lines = author.code_lines(Date.today.to_s(:db))
-		  DailyCodeLine.create(author_id: author.id, repository_id: Repository.first.id, date: '2014-04-28',
-													 addtions: lines.first.to_i, deletions: lines.last.to_i)
+		DailyCodeLine.where(author_id: author.id, repository_id: Repository.first.id, date: Date.today.to_s(:db),
+												 addtions: lines.first.to_i, deletions: lines.last.to_i).first_or_create
   end
 end

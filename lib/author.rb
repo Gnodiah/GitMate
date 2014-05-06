@@ -31,9 +31,9 @@ class Author < ActiveRecord::Base
 
 	validates :name, presence: true, uniqueness: true
 
-  def code_lines(date)
+  def code_lines(date, repo_name)
     # TODO: 要加上git remote update -p;
-    result = "cd /home/gnodiah/code/projects/coshare;git log --all --pretty='%H' --after='#{date} 00:00' --before='#{date} 23:59' --author='#{name}' --numstat | awk 'NF==3 {plus+=$1;minus+=$2;} END {printf(\"" + "+%d, -%d\\n\"" + ", plus, minus)}'"
+    result = "cd /home/gnodiah/code/projects/#{repo_name};git log --all --pretty='%H' --after='#{date} 00:00' --before='#{date} 23:59' --author='#{name}' --numstat | awk 'NF==3 {plus+=$1;minus+=$2;} END {printf(\"" + "+%d, -%d\\n\"" + ", plus, minus)}'"
 
     %x[ #{result} ].scan(/\w+/)
   end
@@ -42,7 +42,7 @@ class Author < ActiveRecord::Base
 		authors = %x[ cd /home/gnodiah/code/projects/coshare;git log --format='%aN:%aE' | sort -u ].split(/\n/)
 		authors.each do |author|
 			author = author.split(':')
-			self.create(name: author.first, email: author.last)
+			self.where(name: author.first, email: author.last).first_or_create
 		end
 	end
 end
@@ -59,6 +59,6 @@ class Repository < ActiveRecord::Base
 	def self.create_repositories
 		repo_url  = %x[ cd /home/gnodiah/code/projects/coshare;git config --get remote.origin.url ]
 		repo_name = repo_url.split('/').last.split('.').first
-		self.create(name: repo_name, url: repo_url)
+		self.where(name: repo_name, url: repo_url).first_or_create
 	end
 end

@@ -7,6 +7,6 @@ table.table.table-bordered.table-striped.table-hover
 	tbody
 		- @repositories.each do |repo|
 			tr
-				td #{repo.id}
-				td #{repo.name}
-				td #{repo.url}
+				td = repo.id
+				td = repo.name
+				td = repo.url

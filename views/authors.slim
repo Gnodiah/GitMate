@@ -5,30 +5,31 @@ javascript:
 	});
 
 form.well.form-inline action='/' method='post'
-  div.form-group
+  .form-group
     label Choose a Repo:
     select.form-control name='repo_name'
       - @repositories.each do |repo|
-        option #{repo.name}
-  div.form-group
+        option = repo.name
+  .form-group
     label Choose a Date:
     input.form-control.datepicker name='date' style='width:auto'
-  div
-    input.btn.btn-primary type='submit' value='Submit'
+  div: input.btn.btn-primary type='submit'
 
-div class='margin: 20px'
-	table.table.table-bordered.table-striped.table-hover
-		thead style='background: #eee'
-			tr
-				th ID
-				th Name
-				th Email
-				th Addtions
-				th Deletions
-				th Total
-		tbody
-		  - for author in @authors
-			  tr
+/ TODO: 为什么在table外面嵌一层div会导致tr只能得到最后一个
+/ 其他的tr都是空的？
+table.table.table-bordered.table-striped.table-hover
+  thead style='background: #eee'
+    tr
+      th ID
+      th Name
+      th Email
+      th Addtions
+      th Deletions
+      th Total
+  tbody
+    - for author in @authors
+      - if author_exists?(author.id, generate_repo)
+        tr
           - code_lines = find_code_lines(author.id, generate_repo, generate_date)
           td = author.id
           td = author.name
