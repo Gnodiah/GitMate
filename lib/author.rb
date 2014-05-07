@@ -31,34 +31,16 @@ class Author < ActiveRecord::Base
 
 	validates :name, presence: true, uniqueness: true
 
-  def code_lines(date, repo_name)
-    # TODO: 要加上git remote update -p;
-    result = "cd /home/weihd/Documents/#{repo_name};git log --all --pretty='%H' --after='#{date} 00:00' --before='#{date} 23:59' --author='#{name}' --numstat | awk 'NF==3 {plus+=$1;minus+=$2;} END {printf(\"" + "+%d, -%d\\n\"" + ", plus, minus)}'"
+  def code_lines(date, repo_dir)
+    # TODO: 要加上git remote update -p;应该在载入程序后自动将所有项目都update一下，
+		# 而不是到这里才update。因为每次计算代码行数才update会很浪费时间且导致重复update
+    result = "cd #{repo_dir};git log --all --pretty='%H' --after='#{date} 00:00' --before='#{date} 23:59' --author='#{name}' --numstat | awk 'NF==3 {plus+=$1;minus+=$2;} END {printf(\"" + "+%d, -%d\\n\"" + ", plus, minus)}'"
 
     %x[ #{result} ].scan(/\w+/)
   end
-
-	def self.create_authors
-		authors = %x[ cd /home/weihd/Documents/tao800_fire;git log --format='%aN:%aE' | sort -u ].split(/\n/)
-		authors.each do |author|
-			author = author.split(':')
-			self.where(name: author.first, email: author.last).first_or_create
-		end
-	end
 end
 
 
 class DailyCodeLine < ActiveRecord::Base
 	belongs_to :authors
-end
-
-class Repository < ActiveRecord::Base
-	validates :name, presence: true, uniqueness: true
-	validates :url,  presence: true, uniqueness: true
-
-	def self.create_repositories
-		repo_url  = %x[ cd /home/weihd/Documents/tao800_fire;;git config --get remote.origin.url ]
-		repo_name = repo_url.split('/').last.split('.').first
-		self.where(name: repo_name, url: repo_url).first_or_create
-	end
 end

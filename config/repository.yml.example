@@ -1,0 +1,6 @@
+# If you want to configure the repositories information beforehand,
+# you should create a 'repository.yml' file. The file's configuration format is:
+# 	Repo_name: Repo_directory
+#
+# For example:
+# GitMate: '/home/gnodiah/code/projects/GitMate'

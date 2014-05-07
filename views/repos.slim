@@ -3,10 +3,12 @@ table.table.table-bordered.table-striped.table-hover
 		tr
 			th ID
 			th Name
-			th Url
+			th Remote Url
+			th Location
 	tbody
 		- @repositories.each do |repo|
 			tr
 				td = repo.id
 				td = repo.name
 				td = repo.url
+				td = repo.dir
