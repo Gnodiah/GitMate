@@ -1,8 +1,10 @@
 require 'active_record'
 require 'yaml'
 require_relative 'author'
+require_relative 'configuration'
 
 class Repository < ActiveRecord::Base
+
 	validates :name, presence: true, uniqueness: true
 	validates :url,  presence: true, uniqueness: true
 
@@ -14,14 +16,10 @@ class Repository < ActiveRecord::Base
 		@root_path
 	end
 
-	CONFIG_FILE = "/home/gnodiah/code/projects/GitMate/config/repository.yml"
-
 	# Create all repositories and all authors of each repository
 	def self.create_repos_and_authors
-		STDOUT.puts CONFIG_FILE
-		return false if !File.exists?(CONFIG_FILE)
+    return false unless (configs = self.fetch_all)
 
-		configs = YAML.load(File.open(CONFIG_FILE))
 		Repository.transaction do
 			configs.each do |name, dir|
 				repo_url  = %x[ cd #{dir};git config --get remote.origin.url ]
@@ -44,4 +42,16 @@ class Repository < ActiveRecord::Base
 			Author.where(name: author.first, email: author.last).first_or_create
 		end
 	end
+
+  # Fetch all branches in all repositories before create repositories
+  def self.fetch_all
+    return false unless (configs = Configuration.load)
+
+    configs.each do |name, dir|
+      # %x[ cd #{dir};git fetch --all ]
+      puts "----- fetching #{dir} -----"
+    end
+
+    configs
+  end
 end
