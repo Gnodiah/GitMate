@@ -11,8 +11,11 @@ form.well.form-inline action='/' method='post'
       - @repositories.each do |repo|
         option = repo.name
   .form-group
-    label Choose a Date:
-    input.form-control.datepicker name='date' style='width:auto'
+    label Choose a (begin) Date:
+    input.form-control.datepicker name='begin_date' style='width:auto'
+  .form-group
+    label Choose a (end) Date:
+    input.form-control.datepicker name='end_date' style='width:auto'
   div: input.btn.btn-primary type='submit'
 
 / TODO: 为什么在table外面嵌一层div会导致tr只能得到最后一个
@@ -30,10 +33,10 @@ table.table.table-bordered.table-striped.table-hover
     - for author in @authors
       - if author_exists?(author.id, generate_repo)
         tr
-          - code_lines = find_code_lines(author.id, generate_repo, generate_date)
+          - code_lines = find_code_lines(author.id, generate_repo, generate_begin_date, params[:end_date])
           td = author.id
           td = author.name
           td = author.email
-          td = code_lines.try(:addtions).to_i
-          td = code_lines.try(:deletions).to_i
-          td = (code_lines.try(:addtions).to_i + code_lines.try(:deletions).to_i)
+          td = code_lines.map(&:addtions).inject(:+).to_i
+          td = code_lines.map(&:deletions).inject(:+).to_i
+          td = (code_lines.map(&:addtions).inject(:+).to_i + code_lines.map(&:deletions).inject(:+).to_i)

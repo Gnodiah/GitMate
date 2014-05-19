@@ -17,16 +17,19 @@ helpers do
     DailyCodeLine.where(author_id: author_id, repository_id: repo_id).present?
 	end
 
-	def find_code_lines(author_id, repo_id, date)
-    DailyCodeLine.find_by(author_id: author_id, repository_id: repo_id, date: date)
+	def find_code_lines(author_id, repo_id, begin_date, end_date)
+    # DailyCodeLine.find_by(author_id: author_id, repository_id: repo_id, date: date)
+		end_date = begin_date if end_date.blank?
+    DailyCodeLine.where(author_id: author_id, repository_id: repo_id)
+								 .where("date >= ? AND date <= ?", begin_date, end_date)
 	end
 
 	def generate_repo
 		request.get? ? @repositories.first.id : @repository.id
 	end
 
-	def generate_date
-		request.get? ? Date.today.to_s(:db) : params[:date]
+	def generate_begin_date
+		request.get? ? Date.today.to_s(:db) : params[:begin_date]
 	end
 end
 
@@ -51,11 +54,16 @@ post '/' do
 	@repository = Repository.find_by(name: params[:repo_name])
   DailyCodeLine.transaction do
     if @repository.present? #&& DailyCodeLine.count(repository_id: @repository.id, date: params[:date]) == 0
-      @authors.each do |author|
-        lines = author.code_lines(params[:date], @repository.dir)
-        dc = DailyCodeLine.where(author_id: author.id, repository_id: @repository.id, date: params[:date]).first_or_create
-				dc.update_attributes(addtions: lines.first.to_i, deletions: lines.last.to_i)
-      end
+			begin_date = params[:begin_date].blank? ? Date.today : Date.parse(params[:begin_date])
+			end_date = params[:end_date].blank? ? begin_date : Date.parse(params[:end_date])
+			(end_date - begin_date + 1).to_i.times do
+				@authors.each do |author|
+					dc = DailyCodeLine.where(author_id: author.id, repository_id: @repository.id, date: begin_date).first_or_create
+					lines = author.code_lines(begin_date, @repository.dir)
+					dc.update_attributes(addtions: lines.first.to_i, deletions: lines.last.to_i)
+				end
+				begin_date = begin_date.next_day if begin_date.present?
+			end
     end
   end
 
