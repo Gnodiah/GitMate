@@ -33,10 +33,10 @@ table.table.table-bordered.table-striped.table-hover
     - for author in @authors
       - if author_exists?(author.id, generate_repo)
         tr
-          - code_lines = find_code_lines(author.id, generate_repo, generate_begin_date, params[:end_date])
+          / - code_lines = find_code_lines(author.id, generate_repo, generate_begin_date, params[:end_date])
           td = author.id
           td = author.name
           td = author.email
-          td = code_lines.map(&:addtions).inject(:+).to_i
-          td = code_lines.map(&:deletions).inject(:+).to_i
-          td = (code_lines.map(&:addtions).inject(:+).to_i + code_lines.map(&:deletions).inject(:+).to_i)
+          td = @code_lines[author.id].first.to_i
+          td = @code_lines[author.id].last.to_i
+          td = @code_lines[author.id].first.to_i + @code_lines[author.id].last.to_i 

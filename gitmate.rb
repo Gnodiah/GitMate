@@ -37,6 +37,12 @@ get '/' do
 	@authors = Author.all
 	@repositories = Repository.all
   # @authors.sort! { |x, y| y[:total] <=> x[:total] }
+  @code_lines = {}
+  repo = Repository.first
+  @authors.each do |author|
+    @code_lines[author.id] = author.code_lines(generate_begin_date, generate_begin_date, repo.dir)
+  end
+  STDOUT.puts  @code_lines
 
 	slim :authors
 end
@@ -50,22 +56,25 @@ end
 post '/' do
 	@authors = Author.all
 	@repositories = Repository.all
+  @code_lines = {}
 
 	@repository = Repository.find_by(name: params[:repo_name])
-  DailyCodeLine.transaction do
+  # DailyCodeLine.transaction do
     if @repository.present? #&& DailyCodeLine.count(repository_id: @repository.id, date: params[:date]) == 0
 			begin_date = params[:begin_date].blank? ? Date.today : Date.parse(params[:begin_date])
 			end_date = params[:end_date].blank? ? begin_date : Date.parse(params[:end_date])
-			(end_date - begin_date + 1).to_i.times do
+			#(end_date - begin_date + 1).to_i.times do
 				@authors.each do |author|
-					dc = DailyCodeLine.where(author_id: author.id, repository_id: @repository.id, date: begin_date).first_or_create
-					lines = author.code_lines(begin_date, @repository.dir)
-					dc.update_attributes(addtions: lines.first.to_i, deletions: lines.last.to_i)
+					#dc = DailyCodeLine.where(author_id: author.id, repository_id: @repository.id, date: begin_date).first_or_create
+          lines = author.code_lines(begin_date, end_date, @repository.dir)
+          @code_lines[author.id] = lines
+					# dc.update_attributes(addtions: lines.first.to_i, deletions: lines.last.to_i)
 				end
-				begin_date = begin_date.next_day if begin_date.present?
-			end
+				#begin_date = begin_date.next_day if begin_date.present?
+			#end
     end
-  end
+  # end
+    puts @code_lines
 
 	slim :authors
 end
