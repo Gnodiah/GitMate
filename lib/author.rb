@@ -36,8 +36,16 @@ class Author < ActiveRecord::Base
 		# 而不是到这里才update。因为每次计算代码行数才update会很浪费时间且导致重复update
     result = "cd #{repo_dir};git log --all --pretty='%H' --after='#{begin_date} 00:00' --before='#{end_date} 23:59' --author='#{name}' --numstat | awk 'NF==3 {plus+=$1;minus+=$2;} END {printf(\"" + "+%d, -%d\\n\"" + ", plus, minus)}'"
 
-    %x[ #{result} ].scan(/\w+/)
+    %x[ #{result} ].scan(/\w+/).map!(&:to_i)
   end
+
+	# Check if this author has contributed to the given repository
+	def contributed_to? repo
+    authors = %x[ cd #{repo.dir};git log --format='%aN:%aE' | sort -u ].split(/\n/)
+    authors.map! { |author| author.split(':').first }
+
+		authors.include? name
+	end
 end
 
 

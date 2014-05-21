@@ -1,10 +1,18 @@
 require 'yaml'
 
 module Configuration
-	CONFIG_FILE = "/home/weihd/Documents/GitMate/config/repository.yml"
+	def self.root_path=(path)
+		@root_path = path
+	end
 
-  def Configuration.load
-		return false if !File.exists?(CONFIG_FILE)
-		YAML.load(File.open(CONFIG_FILE))
+	def self.root_path
+		@root_path
+	end
+
+	def self.load
+		config_file = "#{self.root_path}/config/repository.yml"
+
+		return false if !File.exists?(config_file)
+		YAML.load(File.open(config_file))
   end
 end

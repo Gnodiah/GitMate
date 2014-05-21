@@ -8,14 +8,6 @@ class Repository < ActiveRecord::Base
 	validates :name, presence: true, uniqueness: true
 	validates :url,  presence: true, uniqueness: true
 
-	def self.root_path=(path)
-		@root_path = path
-	end
-
-	def self.root_path
-		@root_path
-	end
-
   # Return all authors of current repository
   def authors
     authors = %x[ cd #{dir};git log --format='%aN:%aE' | sort -u ].split(/\n/)
@@ -27,7 +19,7 @@ class Repository < ActiveRecord::Base
   class << self
     # Create all repositories and all authors of each repository
     def create_repos_and_authors
-      return false unless (configs = self.fetch_all)
+      return false unless (configs = fetch_all)
 
       Repository.transaction do
         configs.each do |name, dir|
@@ -39,7 +31,7 @@ class Repository < ActiveRecord::Base
           repo.update_attributes(url: repo_url, dir: dir)
 
           # Also create all authors of this repository
-          self.class.create_authors(dir)
+          create_authors(dir)
         end
       end
     end
@@ -54,11 +46,15 @@ class Repository < ActiveRecord::Base
 
     # Fetch all branches in all repositories before create repositories
     def fetch_all
+			logger.info Configuration.root_path
+			# TODO: why cannot access Sinatra::Base.settings ?
+			logger.info Sinatra::Base.settings.root
       return false unless (configs = Configuration.load)
 
       configs.each do |name, dir|
-        # %x[ cd #{dir};git fetch --all ]
-        puts "----- fetching #{dir} -----"
+        logger.debug "----- Fetching #{name} start -----"
+        %x[ cd #{dir};git fetch --all ]
+        logger.debug "----- Fetching #{name} done  -----"
       end
 
       configs
