@@ -14,6 +14,13 @@ configure do
 end
 
 helpers do
+  def begin_date
+    params[:begin_date].blank? ? Date.today.prev_day : Date.parse(params[:begin_date])
+  end
+
+  def end_date
+    params[:end_date].blank? ? begin_date : Date.parse(params[:end_date])
+  end
 end
 
 get '/' do
@@ -22,14 +29,14 @@ get '/' do
   @code_lines 	= {}
 
   @repository.authors.each do |author|
-		code_lines = author.code_lines(Date.today, Date.today, @repository.dir)
+    code_lines = author.code_lines(begin_date, end_date, @repository.dir)
 		code_lines << code_lines.inject(:+)
+    code_lines << author # Add current author object for sorting
 		@code_lines[author.id] = code_lines
 	end
 
 	# Sort the result according to total code lines
-  sorted_authors_ids = @code_lines.sort { |x, y| y.last <=> x.last }.map { |c| c.first }
-	@authors = Author.where(id: sorted_authors_ids)
+  @sorted_code_lines = @code_lines.sort { |x, y| y.last[2] <=> x.last[2] }.map { |c| c.last }
 
 	slim :authors
 end
@@ -41,17 +48,15 @@ post '/' do
 	@repositories = Repository.all
   @code_lines 	= {}
 
-	begin_date = params[:begin_date].blank? ? Date.today : Date.parse(params[:begin_date])
-	end_date 	 = params[:end_date].blank? ? begin_date : Date.parse(params[:end_date])
 	@repository.authors.each do |author|
 		code_lines = author.code_lines(begin_date, end_date, @repository.dir)
 		code_lines << code_lines.inject(:+)
+    code_lines << author
 		@code_lines[author.id] = code_lines
 	end
 
 	# Sort the result according to total code lines
-  sorted_authors_ids = @code_lines.sort { |x, y| y.last <=> x.last }.map { |c| c.first }
-	@authors = Author.where(id: sorted_authors_ids)
+  @sorted_code_lines = @code_lines.sort { |x, y| y.last[2] <=> x.last[2] }.map { |c| c.last }
 
 	slim :authors
 end

@@ -9,13 +9,16 @@ form.well.form-inline action='/' method='post'
     label Choose a Repo:
     select.form-control name='repo_name'
       - @repositories.each do |repo|
-        option = repo.name
+        - if repo.name == params[:repo_name]
+          option selected='selected' #{repo.name}
+        - else
+          option = repo.name
   .form-group
     label Choose a (begin) Date:
-    input.form-control.datepicker name='begin_date' style='width:auto'
+    input.form-control.datepicker name='begin_date' style='width:auto' value="#{begin_date}"
   .form-group
     label Choose a (end) Date:
-    input.form-control.datepicker name='end_date' style='width:auto'
+    input.form-control.datepicker name='end_date' style='width:auto' value="#{end_date}"
   div: input.btn.btn-primary type='submit'
 
 / TODO: 为什么在table外面嵌一层div会导致tr只能得到最后一个,其他的tr都是空的？
@@ -29,12 +32,11 @@ table.table.table-bordered.table-striped.table-hover
       th Deletions
       th Total
   tbody
-    - for author in @authors
-      / - if author.contributed_to? @repository
+    - for line in @sorted_code_lines
       tr
-        td = author.id
-        td = author.name
-        td = author.email
-        td = @code_lines[author.id][0]
-        td = @code_lines[author.id][1]
-        td = @code_lines[author.id][2]
+        td = line.last.id
+        td = line.last.name
+        td = line.last.email
+        td = line[0]
+        td = line[1]
+        td = line[2]
