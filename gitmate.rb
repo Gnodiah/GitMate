@@ -62,7 +62,39 @@ post '/' do
 end
 
 get '/commits' do
-	'In processing...'
+  @repositories = Repository.all
+	@repository 	= @repositories.first
+  @commits 	= []
+
+  @repository.authors.each do |author|
+    commits = [author.commits(begin_date, end_date, @repository.dir)]
+    commits << author # Add current author object for sorting
+		@commits << commits
+	end
+
+	# Sort the result according to total code lines
+  @sorted_commits = @commits.sort { |x, y| y.first <=> x.first }
+
+  slim :commits
+end
+
+post '/commits' do
+	@repository = Repository.find_by(name: params[:repo_name])
+	halt 404, "This repository doesn't exist." if @repository.blank?
+
+  @repositories = Repository.all
+  @commits 	= []
+
+  @repository.authors.each do |author|
+    commits = [author.commits(begin_date, end_date, @repository.dir)]
+    commits << author # Add current author object for sorting
+		@commits << commits
+	end
+
+	# Sort the result according to total code lines
+  @sorted_commits = @commits.sort { |x, y| y.first <=> x.first }
+
+  slim :commits
 end
 
 get '/repos' do

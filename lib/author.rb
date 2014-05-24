@@ -39,6 +39,12 @@ class Author < ActiveRecord::Base
     %x[ #{result} ].scan(/\w+/).map!(&:to_i)
   end
 
+  def commits(begin_date, end_date, repo_dir)
+    result = "cd #{repo_dir};git log --all --pretty='%H' --after='#{begin_date} 00:00' --before='#{end_date} 23:59' --author='#{name}' | wc -l"
+
+    %x[ #{result} ].to_i
+  end
+
 	# Check if this author has contributed to the given repository
 	def contributed_to? repo
     authors = %x[ cd #{repo.dir};git log --format='%aN:%aE' | sort -u ].split(/\n/)
