@@ -61,6 +61,10 @@ post '/' do
 	slim :authors
 end
 
+get '/commits' do
+	'In processing...'
+end
+
 get '/repos' do
 	@repositories = Repository.all
 
