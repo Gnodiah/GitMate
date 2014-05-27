@@ -21,18 +21,3 @@ form.well.form-inline action='/commits' method='post'
     input.form-control.datepicker name='end_date' style='width:auto' value="#{end_date}"
   div: input.btn.btn-primary type='submit'
 
-/ TODO: 为什么在table外面嵌一层div会导致tr只能得到最后一个,其他的tr都是空的？
-table.table.table-bordered.table-striped.table-hover
-  thead style='background: #eee'
-    tr
-      th ID
-      th Name
-      th Email
-      th Commits
-  tbody
-    - for line in @sorted_commits
-      tr
-        td = line.last.id
-        td = line.last.name
-        td = line.last.email
-        td = line.first.to_s
